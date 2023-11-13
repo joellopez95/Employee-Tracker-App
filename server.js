@@ -1,80 +1,135 @@
-//handle on all routes, libs
+//handle on all libraries needed
 const express = require('express');
 const inquirer = require('inquirer');
-const connection = require('./config/connection');
-const app = express();
-const PORT = process.env.PORT || 3001;
-const viewRoutes = require('./routes/viewRoutes');
-const addRoutes = require('./routes/addRoutes');
-const updateRoutes = require('./routes/updateRoutes');
+const mysql = require('mysql2');
 
-// Middleware
-app.use(express.urlencoded({ extended: true }));
+//setting port for server
+const PORT = process.env.PORT || 3001;
+const app = express();
+
+//middleware
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// Connect to the MySQL server
-connection.connect((err) => {
-  if (err) throw err;
-  console.log('Connected to the MySQL server.');
-  startApp();
+//connection to mysql
+const db = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: 'Striker@1995',
+  database: 'employee_management_db'
 });
 
-function startApp() {
-    inquirer
-        .prompt([
-            {
-                type: 'list',
-                name: 'action',
-                message: 'What would you like to do?',
-                choices: [
-                    'View all departments',
-                    'View all roles',
-                    'View all employees',
-                    'Add a department',
-                    'Add a role',
-                    'Add an employee',
-                    'Update an employee role',
-                    'Exit'  
-                ],
-            },
-        ])
-        .then((answers) => {
-            // You can handle the user's choice here
-            switch (answers.action) {
-                case 'View all departments':
-                    // Call a function to handle viewing all departments
-                    break;
-                case 'View all roles':
-                    // Call a function to handle viewing all roles
-                    break;
-                case 'View all employees':
-                    // Call a function to handle viewing all employees
-                    break;
-                case 'Add a department':
-                    // Call a function to handle adding a department
-                    break;
-                case 'Add a role':
-                    // Call a function to handle adding a role
-                    break;
-                case 'Add an employee':
-                    // Call a function to handle adding an employee
-                    break;
-                case 'Update an employee role':
-                    // Call a function to handle updating an employee role
-                    break;
-                case 'Exit':
-                    // Exit the application or perform any necessary cleanup
-                    console.log('Exiting application...');
-                    break;
-                default:
-                    console.log('Invalid choice. Please try again.');
-            }
-        });
-}
+//db connection (boiler plate code)
+db.connect(err => {
+  if (err) {
+    console.error('Error connecting to the database: ' + err.stack);
+    return;
+  }
+  console.log('Connected to the database as id ' + db.threadId);
+});
 
-// Call the startApp function to initiate the prompt
-startApp();
+// Function to fetch and display all departments from the database
+const viewAllDepartments = () => {
+  const query = 'SELECT * FROM departments';
+  db.query(query, (err, results) => {
+    if (err) throw err;
+    console.table(results);
+    runApp();
+  });
+};
+
+// Function to fetch and display all roles from the database
+const viewAllRoles = () => {
+  const query = 'SELECT * FROM roles';
+  db.query(query, (err, results) => {
+    if (err) throw err;
+    console.table(results);
+    runApp();
+  });
+};
+
+// Function to fetch and display all employees from the database
+const viewAllEmployees = () => {
+  const query = 'SELECT * FROM employees';
+  db.query(query, (err, results) => {
+    if (err) throw err;
+    console.table(results);
+    runApp();
+  });
+};
+
+// Function to add a department to the database
+const addDepartment = () => {
+  inquirer
+    .prompt([
+      {
+        type: 'input',
+        name: 'name',
+        message: 'Enter the name of the department:'
+      }
+    ])
+    .then(answer => {
+      const query = 'INSERT INTO departments SET ?';
+      db.query(query, { name: answer.name }, (err, results) => {
+        if (err) throw err;
+        console.log('Department added!');
+        runApp();
+      });
+    });
+};
+
+const addRole = () => {
+  // Similar logic as addDepartment
+};
+
+const addEmployee = () => {
+  // Similar logic as addDepartment
+};
+
+const updateEmployeeRole = () => {
+  // Similar logic as addDepartment
+};
+
+//object mapping actions to corresponding functions
+//source : sentry.io
+const actions = {
+  'View all departments': viewAllDepartments,
+  'View all roles': viewAllRoles,
+  'View all employees': viewAllEmployees,
+  'Add a department': addDepartment,
+  'Add a role': addRole,
+  'Add an employee': addEmployee,
+  'Update an employee role': updateEmployeeRole,
+  'Exit': () => {
+    console.log('Exiting...');
+    db.end();
+    process.exit();
+  }
+};
+
+// Function to start the application and prompt the user for actions
+const runApp = () => {
+  inquirer
+    .prompt([
+      {
+        type: 'list',
+        name: 'action',
+        message: 'What would you like to do?',
+        choices: Object.keys(actions)
+      }
+    ])
+    .then(answer => {
+      const selectedAction = actions[answer.action];
+      if (selectedAction) {
+        selectedAction();
+      } else {
+        console.log('Invalid option. Please try again.');
+        runApp();
+      }
+    });
+};
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`)
+  console.log(`Server running on port ${PORT}`);
+  runApp();
 });
