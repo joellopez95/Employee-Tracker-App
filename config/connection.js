@@ -5,7 +5,7 @@ const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: 'Striker@1995',
-  database: 'employee_management_db', // Updated to use the new database
+  database: 'employee_management_db', 
 });
 
 module.exports = connection;
