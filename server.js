@@ -37,8 +37,43 @@ function startApp() {
                     'Exit'  
                 ],
             },
-        ])}
+        ])
+        .then((answers) => {
+            // You can handle the user's choice here
+            switch (answers.action) {
+                case 'View all departments':
+                    // Call a function to handle viewing all departments
+                    break;
+                case 'View all roles':
+                    // Call a function to handle viewing all roles
+                    break;
+                case 'View all employees':
+                    // Call a function to handle viewing all employees
+                    break;
+                case 'Add a department':
+                    // Call a function to handle adding a department
+                    break;
+                case 'Add a role':
+                    // Call a function to handle adding a role
+                    break;
+                case 'Add an employee':
+                    // Call a function to handle adding an employee
+                    break;
+                case 'Update an employee role':
+                    // Call a function to handle updating an employee role
+                    break;
+                case 'Exit':
+                    // Exit the application or perform any necessary cleanup
+                    console.log('Exiting application...');
+                    break;
+                default:
+                    console.log('Invalid choice. Please try again.');
+            }
+        });
+}
 
+// Call the startApp function to initiate the prompt
+startApp();
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`)
