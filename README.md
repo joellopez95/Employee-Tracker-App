@@ -49,7 +49,7 @@ The Employee Tracker App provides a simple and efficient way to manage employee 
 Note: Ensure that you have set up the MySQL database and updated the connection details in the `server.js` file before running the application.
 
    **Video:**
-   - [![Employee-Tracker]](https://watch.screencastify.com/v/obofcCDdpqhQzf0s6uOr)
+   - [Employee-Tracker](https://watch.screencastify.com/v/obofcCDdpqhQzf0s6uOr)
 
 
 
